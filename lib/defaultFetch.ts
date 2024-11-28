@@ -28,7 +28,7 @@ export const defaultFetch = async (
             "Content-Type": "application/json",
             ...options?.headers,
         },
-        // credentials: "include",
+        credentials: "include",
     };
 
     const res = await fetch(`${urlBackend}/api/v1/${endpoint}`, options);

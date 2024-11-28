@@ -1,7 +1,7 @@
 import LoaderPage from "@/components/Loader/LoaderPage";
 
-const page = () => {
+const loading = () => {
     return <LoaderPage />;
 };
 
-export default page;
+export default loading;

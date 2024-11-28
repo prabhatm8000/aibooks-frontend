@@ -33,7 +33,7 @@ export function AutoCarousel({
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}
         >
-            <CarouselContent className="h-full">
+            <CarouselContent className="h-full flex items-center">
                 {cardContents.map((cardContent, index) => (
                     <CarouselItem key={index}>{cardContent}</CarouselItem>
                 ))}

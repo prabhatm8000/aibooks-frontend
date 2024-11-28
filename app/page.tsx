@@ -1,5 +1,10 @@
 import { AutoCarousel } from "@/components/AutoCarousel";
-import { TypographyH1, TypographyH3 } from "@/components/ui/typography";
+import LatestRelease from "@/components/LatestRelease";
+import {
+    TypographyH1,
+    TypographyH2,
+    TypographyH3,
+} from "@/components/ui/typography";
 import { BookIcon, DownloadIcon, GemIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -57,40 +62,35 @@ const heroCards = heroCardContent.map((item) => (
     </div>
 ));
 
+const heroLines = [
+    "Explore the Boundless Imagination of AI: Unique Stories Crafted by Artificial Intelligence!",
+    "Step Into a Library Like No Other: AI-Generated Stories, Endless Creativity.",
+    "Where AI Meets Storytelling: Discover Worlds Only Machines Can Imagine.",
+];
+
+const heroLineCards = heroLines.map((line) => (
+    <div className="h-full">
+        <TypographyH1 className="text-center text-5xl">
+            {line}
+        </TypographyH1>
+    </div>
+));
+
 const HeroSection = () => {
     return (
-        <div className="relative w-full h-[40rem] lg:h-96">
+        <div className="relative w-full h-[35rem] lg:h-[30rem]">
             <Image
                 src={"/static/images/bg-home-hero.jpg"}
                 alt=""
                 width={1920}
                 height={1080}
                 loading="eager"
-                className="object-cover rounded-xl h-[40rem] lg:h-96"
+                className="object-cover rounded-xl h-[35rem] lg:h-[30rem]"
             />
             <div
-                className={`absolute top-0 h-full bg-background/10 p-2 grid grid-cols-1 lg:grid-cols-[10fr_6fr] xl:grid-cols-[10fr_1fr] gap-5 items-center justify-center text-white`}
+                className={`absolute top-0 w-full h-full align-middle bg-background/10 p-2 text-white`}
             >
-                <div className="text-center">
-                    <TypographyH1>
-                        Explore AI-Generated Books: Creativity Beyond
-                        Imagination!
-                    </TypographyH1>
-                </div>
-                <div className="text-center h-full w-full rounded-lg bg-background/20 text-foreground">
-                    <AutoCarousel cardContents={heroCards} />
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const LatestRelease = () => {
-    return (
-        <div className="space-y-4">
-            <div className="my-2 w-fit">
-                <TypographyH3>Latest Release</TypographyH3>
-                <div className="h-1 w-10/12 bg-yellow-400"></div>
+                <AutoCarousel cardContents={heroLineCards} />
             </div>
         </div>
     );
@@ -101,6 +101,9 @@ const MainSection = () => {
         <div className="flex flex-col gap-8">
             <HeroSection />
             <LatestRelease />
+            <div className="text-center h-full w-full rounded-lg bg-background/20 text-foreground">
+                <AutoCarousel cardContents={heroCards} />
+            </div>
         </div>
     );
 };

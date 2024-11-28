@@ -1,13 +1,15 @@
 export function TypographyH1({
     children,
     isMuted,
+    className,
 }: {
     children: React.ReactNode;
     isMuted?: boolean;
+    className?: string;
 }) {
     return (
         <h1
-            className={`scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-5xl xl:text-6xl 2xl:text-7xl ${
+            className={`scroll-m-20 text-6xl font-extrabold tracking-tight lg:text-5xl xl:text-6xl 2xl:text-7xl ${className} ${
                 isMuted ? "text-muted-foreground" : ""
             }`}
         >
@@ -16,7 +18,7 @@ export function TypographyH1({
     );
 }
 
-export function  TypographyH2({
+export function TypographyH2({
     children,
     className,
 }: {
@@ -26,8 +28,7 @@ export function  TypographyH2({
     return (
         <h2
             className={
-                "scroll-m-20 text-3xl font-semibold tracking-tight " +
-                className
+                "scroll-m-20 text-3xl font-semibold tracking-tight " + className
             }
         >
             {children}
@@ -112,13 +113,15 @@ export function TypographyP({
 export function TypographySmall({
     children,
     isMuted,
+    className,
 }: {
     children: React.ReactNode;
     isMuted?: boolean;
+    className?: string;
 }) {
     return (
         <small
-            className={`text-sm font-medium leading-none ${
+            className={`text-sm font-medium leading-none ${className} ${
                 isMuted ? "text-muted-foreground" : ""
             }`}
         >

@@ -3,6 +3,7 @@ import PageLayout from "@/components/PageLayout";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
 
 export const metadata: Metadata = {
     title: "AiBooks",
@@ -23,14 +24,16 @@ export default function RootLayout({
     return (
         // suppressHydrationWarning for next-themes
         <html lang="en" suppressHydrationWarning>
-            <body className={`${font.className} antialiased`}>
+            <body className={`${font.className} antialiased transition-colors duration-150`}>
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <PageLayout>{children}</PageLayout>
+                    <RouterContext.Provider value={null}>
+                        <PageLayout>{children}</PageLayout>
+                    </RouterContext.Provider>
                 </ThemeProvider>
             </body>
         </html>
