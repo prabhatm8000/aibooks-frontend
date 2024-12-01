@@ -13,16 +13,22 @@ const UserAvtar = ({
     size?: number;
 }) => {
     return (
-        <Avatar className="aspect-square object-cover">
+        <Avatar className="">
             <AvatarImage
                 alt={user.given_name}
                 src={user.picture}
                 width={size || 30}
                 height={size || 30}
-                className="object-cover rounded-full border border-muted"
+                className="object-cover rounded-full"
             />
-            <AvatarFallback>
-                <div className="size-[75px] flex items-center justify-center rounded-full border border-muted text-3xl">
+            <AvatarFallback className="">
+                <div
+                    className={`flex items-center justify-center rounded-full`}
+                    style={{
+                        width: size || 30,
+                        height: size || 30,
+                    }}
+                >
                     {user.given_name.charAt(0) + user.family_name.charAt(0)}
                 </div>
             </AvatarFallback>

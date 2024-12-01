@@ -1,6 +1,14 @@
 "use client";
 
-import { LibraryIcon, LogOutIcon, MenuIcon, Moon, Sun } from "lucide-react";
+import {
+    CloudAlertIcon,
+    LibraryIcon,
+    LogOutIcon,
+    MenuIcon,
+    Moon,
+    Search,
+    Sun,
+} from "lucide-react";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
@@ -11,36 +19,42 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useEffect, useRef, useState } from "react";
-import { TypographyH3, TypographyH5, TypographySmall } from "./ui/typography";
-
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-} from "@/components/ui/command";
+    TypographyH3,
+    TypographyH5,
+    TypographyP,
+    TypographySmall,
+} from "./ui/typography";
+
 import useUserAuthStore from "@/hooks/zustand/useUserAuthStore";
 import { getSearchSuggestions, getUser, login, logout } from "@/lib/apiClient";
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import Image from "next/image";
-import ThreeDotLoading from "./Loader/ThreeDotLoading";
+import LoadingSpinner from "./Loader/LoadingSpinner";
 import { ButtonLink } from "./ui/buttonlink";
 import UserAvtar from "./UserAvtar";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-type CommandItemType = {
+type SuggestionsType = {
     id: string;
     label: string;
     label2?: string;
-    icon: React.ReactNode;
+    icon: {
+        publicId: string;
+        url: string;
+        width: {
+            small: number;
+            medium: number;
+            large: number;
+        };
+        height: {
+            small: number;
+            medium: number;
+            large: number;
+        };
+    };
     isDisabled?: boolean;
-};
-
-type CommandGroupType = {
-    heading?: string;
-    items: CommandItemType[];
+    href?: string;
 };
 
 export default function NavBar({
@@ -48,20 +62,17 @@ export default function NavBar({
 }: {
     onMenuBtnClick: () => void;
 }) {
+    const router = useRouter();
     const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
 
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [loadingSuggestions, setLoadingSuggestions] =
         useState<boolean>(false);
     const [searchSuggestionsList, setSearchSuggestionsList] = useState<
-        CommandGroupType[]
+        SuggestionsType[]
     >([]);
 
-    const onSearchSuggestionClick = (item: CommandItemType) => {
-        window.location.href = `/book/byId/${item.id}`;
-        console.log(item);
-    };
-
+    // #region [handling focus & key bindings]
     useEffect(() => {
         const focusSearchInput = (ev: KeyboardEvent) => {
             if (ev.ctrlKey && ev.key === "k") {
@@ -75,7 +86,8 @@ export default function NavBar({
                 searchQuery.length > 0
             ) {
                 ev.preventDefault();
-                window.location.href = `/book/search?q=${searchQuery}`;
+                setIsSearchInputFocused(false);
+                router.push(`/book/search?q=${searchQuery}`);
             }
         };
 
@@ -85,45 +97,26 @@ export default function NavBar({
             removeEventListener("keydown", focusSearchInput);
         };
     }, [searchQuery]);
+    // #endregion
 
+    // #region [handling suggestions]
     useEffect(() => {
         const populate = () => {
-            setLoadingSuggestions(true);
             if (searchQuery.length === 0) {
+                setLoadingSuggestions(false);
                 return;
             }
+            setLoadingSuggestions(true);
             getSearchSuggestions(searchQuery, 5)
                 .then((res) => {
-                    const list: CommandGroupType[] = [
-                        {
-                            heading: "Suggestions",
-                            items: res.map((item) => ({
-                                id: item.id,
-                                label: item.title,
-                                label2: item.genre.join(", "),
-                                icon: (
-                                    <>
-                                        <Image
-                                            src={item.coverImage.url}
-                                            alt={item.title}
-                                            width={
-                                                item.coverImage.width.small /
-                                                1.5
-                                            }
-                                            height={
-                                                item.coverImage.height.small /
-                                                1.5
-                                            }
-                                            className="object-cover bg-primary"
-                                            // onErrorCapture={}
-                                        />
-                                    </>
-                                ),
-                                isDisabled: false,
-                                onClick: () => {},
-                            })),
-                        },
-                    ];
+                    const list: SuggestionsType[] = res.map((item) => ({
+                        id: item.id,
+                        label: item.title,
+                        label2: item.genre.join(", "),
+                        icon: item.coverImage,
+                        isDisabled: false,
+                        href: `/book/byId/${item.id}`,
+                    }));
                     setSearchSuggestionsList(list);
                 })
                 .finally(() => setLoadingSuggestions(false));
@@ -135,6 +128,7 @@ export default function NavBar({
             clearTimeout(timeout);
         };
     }, [searchQuery]);
+    // #endregion
 
     return (
         <header className="sticky top-0 mx-auto z-50 bg-gradient-to-b from-background from-[75%] to-background/0 w-full">
@@ -150,10 +144,9 @@ export default function NavBar({
                     <TypographyH3>AiBooks</TypographyH3>
                 </div>
 
-                <div className="flex items-center justify-end md:justify-between gap-4 w-full">
+                <div className="flex items-center justify-end md:justify-between gap-4 w-full pb-2">
                     <div className="hidden md:block w-1/2">
-                        <CommandInputWithList
-                            onItemClick={onSearchSuggestionClick}
+                        <SearchWithSuggestions
                             isSearchInputFocused={isSearchInputFocused}
                             setIsSearchInputFocused={setIsSearchInputFocused}
                             placeholder="Search (ctrl+k)..."
@@ -169,9 +162,8 @@ export default function NavBar({
                     </div>
                 </div>
             </nav>
-            <div className="block md:hidden pb-2 w-full">
-                <CommandInputWithList
-                    onItemClick={onSearchSuggestionClick}
+            <div className="block md:hidden pb-8 w-full">
+                <SearchWithSuggestions
                     isSearchInputFocused={isSearchInputFocused}
                     setIsSearchInputFocused={setIsSearchInputFocused}
                     placeholder="Search (ctrl+k)..."
@@ -185,100 +177,131 @@ export default function NavBar({
     );
 }
 
-function CommandInputWithList({
+function SearchWithSuggestions({
     isSearchInputFocused,
     setIsSearchInputFocused,
     placeholder,
     list,
     loadingList,
-    onItemClick,
     value,
     onValueChange,
 }: {
     isSearchInputFocused: boolean;
     setIsSearchInputFocused: (v: boolean) => void;
     placeholder?: string;
-    list?: CommandGroupType[];
+    list?: SuggestionsType[];
     loadingList?: boolean;
-    onItemClick?: (item: CommandItemType) => void;
     value?: string;
     onValueChange?: (v: string) => void;
 }) {
-    const [hideList, setHideList] = useState(true);
-    const [inputValue, setInputValue] = useState<string>(value ?? "");
+    const [hideList, setHideList] = useState(!isSearchInputFocused);
     const ref = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (onValueChange) {
-            onValueChange(inputValue);
-        }
-    }, [inputValue]);
+    const [imageErrors, setImageErrors] = useState<boolean[]>(
+        Array(list?.length).fill(false)
+    );
 
     useEffect(() => {
+        const ele = ref.current;
         if (isSearchInputFocused) {
-            ref.current?.focus();
+            setHideList(false);
+            ele?.focus();
         } else {
-            ref.current?.blur();
+            ele?.blur();
+            setHideList(true);
         }
     }, [isSearchInputFocused]);
 
     return (
-        <Command className="rounded-lg border shadow-md md:max-w-[450px]">
-            <CommandInput
-                ref={ref}
-                placeholder={placeholder}
-                value={inputValue}
-                onValueChange={(v) => {
-                    setInputValue(v);
-                }}
-                onFocus={() => setHideList(false)}
-                onBlur={() => setHideList(true)}
-            />
-            <CommandList
-                hidden={hideList || inputValue.length === 0}
-                className="absolute top-full w-full md:max-w-[450px] z-[51] bg-background"
-            >
-                {loadingList ? (
-                    <div className="flex justify-center my-2">
-                        <ThreeDotLoading />
-                    </div>
-                ) : (
-                    <CommandEmpty>No results found.</CommandEmpty>
-                )}
-                {list?.map((group, index) => (
-                    <div key={group.heading || "" + index}>
-                        <CommandGroup heading={group.heading}>
-                            {group.items.map((item) => (
-                                <CommandItem
-                                    key={item.label}
-                                    disabled={item.isDisabled}
-                                    onSelect={() => {
-                                        if (onItemClick) {
-                                            onItemClick(item);
+        <div className="relative">
+            <div className="flex items-center gap-2 py-2 px-3 border border-muted rounded-lg">
+                <Search size={20} />
+                <input
+                    ref={ref}
+                    className="bg-transparent focus:outline-none placeholder:text-muted-foreground w-full"
+                    placeholder={placeholder}
+                    value={value}
+                    onChange={(e) => onValueChange?.(e.target.value)}
+                    onFocus={() => setIsSearchInputFocused(true)}
+                />
+                <div
+                    className={`${
+                        loadingList ? "visible" : "invisible"
+                    } p-0 flex justify-center`}
+                >
+                    <LoadingSpinner />
+                </div>
+            </div>
+            {!hideList && (
+                <>
+                    <div
+                        className="fixed z-50 w-screen h-screen left-0 top-0"
+                        onClick={() => setIsSearchInputFocused(false)}
+                    />
+                    <div className="z-[55] absolute bg-background w-full my-2 border border-muted rounded-lg">
+                        {list && list.length > 0 && (
+                            <div className="p-2">
+                                {list?.map((item, index) => (
+                                    <Link
+                                        href={item?.href || "#"}
+                                        onClick={() =>
+                                            setIsSearchInputFocused(false)
                                         }
-                                        console.log(item);
-                                    }}
-                                    value={item.label}
-                                >
-                                    {item.icon}
-                                    <div className="capitalize">
-                                        <TypographyH5>
-                                            {item.label}
-                                        </TypographyH5>
-                                        <TypographyH5 isMuted>
-                                            {item.label2}
-                                        </TypographyH5>
-                                    </div>
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
-                        {index != list.length - 1 && (
-                            <CommandSeparator key={"sep-" + index} />
+                                        key={index}
+                                        className="flex items-center gap-2 p-2 rounded-md cursor-pointer hover:bg-muted"
+                                    >
+                                        {
+                                            <div className="relative aspect-[13/19] w-12">
+                                                {imageErrors[index] ? (
+                                                    <CloudAlertIcon className="absolute inset-0 m-auto" />
+                                                ) : (
+                                                    <Image
+                                                        src={item.icon.url}
+                                                        alt={item.label}
+                                                        width={
+                                                            item.icon.width
+                                                                .small / 2
+                                                        }
+                                                        height={
+                                                            item.icon.height
+                                                                .small / 2
+                                                        }
+                                                        loading="eager"
+                                                        className={`object-cover rounded-md aspect-[13/19] size-full ${
+                                                            imageErrors[index]
+                                                                ? "hidden"
+                                                                : ""
+                                                        }`}
+                                                        onError={() =>
+                                                            setImageErrors(
+                                                                (prev) => {
+                                                                    prev[
+                                                                        index
+                                                                    ] = true;
+                                                                    return prev;
+                                                                }
+                                                            )
+                                                        }
+                                                    />
+                                                )}
+                                            </div>
+                                        }
+                                        <div className="flex flex-col gap-1">
+                                            <TypographyP>
+                                                {item.label}
+                                            </TypographyP>
+                                            <TypographySmall isMuted>
+                                                {item.label2}
+                                            </TypographySmall>
+                                        </div>
+                                    </Link>
+                                ))}
+                            </div>
                         )}
                     </div>
-                ))}
-            </CommandList>
-        </Command>
+                </>
+            )}
+        </div>
     );
 }
 
@@ -342,7 +365,7 @@ const UserButton = () => {
                         <Button
                             variant="outline"
                             size="icon"
-                            className="rounded-full size-10"
+                            className="rounded-full size-10 border-0"
                             title={`${user.given_name} ${user.family_name}`}
                         >
                             <UserAvtar size={40} user={user} />

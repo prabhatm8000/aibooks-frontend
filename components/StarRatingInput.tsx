@@ -43,7 +43,7 @@ const StarRatingInput: React.FC<StarRatingInputProps> = ({
                     className="cursor-pointer"
                 />
             ))}
-            <Button className="py-1 px-2 h-fit w-fit" onClick={() => handleClick(0)}>clear</Button>
+            <Button type="button" className="py-1 px-2 h-fit w-fit" title="Reset stars" onClick={() => handleClick(0)}>Reset</Button>
         </div>
     );
 };

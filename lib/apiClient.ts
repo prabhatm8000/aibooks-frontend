@@ -5,6 +5,7 @@ import type {
     CategoriesResponse,
     SearchSuggestionsResponse,
     UserAuthResponse,
+    UserLibraryResponse,
 } from "./apiResponseTypes";
 import { defaultFetch } from "./defaultFetch";
 
@@ -55,7 +56,7 @@ export const getUser = async (): Promise<UserAuthResponse> => {
 
 export const getSearchSuggestions = async (
     query: string,
-    limit: number,
+    limit: number
 ): Promise<SearchSuggestionsResponse> => {
     const res = await defaultFetch(
         `books/searchSuggestions?q=${query}&limit=${limit}`,
@@ -64,6 +65,25 @@ export const getSearchSuggestions = async (
                 "Content-Type": "application/json",
             },
             method: "GET",
+        }
+    );
+    return res.json();
+};
+
+export const searchBooks = async (
+    query: string,
+    signal?: AbortSignal,
+    page: number = 1,
+    limit: number = 10
+): Promise<BookResponse[]> => {
+    const res = await defaultFetch(
+        `books/search?q=${query}&page=${page}&limit=${limit}`,
+        {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "GET",
+            signal,
         }
     );
     return res.json();
@@ -100,6 +120,21 @@ export const getLatestReleases = async (
     signal?: AbortSignal
 ): Promise<BookResponse[]> => {
     const res = await defaultFetch(`books/latest`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "GET",
+        signal,
+    });
+    return res.json();
+};
+
+export const getRelatedBooks = async (
+    bookId: string,
+    limit: number = 10,
+    signal?: AbortSignal
+): Promise<BookResponse[]> => {
+    const res = await defaultFetch(`books/related/${bookId}?limit=${limit}`, {
         headers: {
             "Content-Type": "application/json",
         },
@@ -164,6 +199,62 @@ export const deleteBookRating = async (
             "Content-Type": "application/json",
         },
         method: "DELETE",
+    });
+    return res.json();
+};
+
+export const getLibrary = async (
+    page: number = 1,
+    limit: number = 10,
+    signal?: AbortSignal
+): Promise<UserLibraryResponse[]> => {
+    const res = await defaultFetch(
+        `myLibrary/getBooks?page=${page}&limit=${limit}`,
+        {
+            headers: {
+                "Content-Type": "application/json",
+            },
+            method: "GET",
+            signal,
+        }
+    );
+    return res.json();
+};
+
+export const addBookToLibrary = async (
+    bookId: string
+): Promise<{ message: string }> => {
+    const res = await defaultFetch(`myLibrary/addBook/${bookId}`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "PUT",
+    });
+    return res.json();
+};
+
+export const removeBookFromLibrary = async (
+    bookId: string
+): Promise<{ message: string }> => {
+    const res = await defaultFetch(`myLibrary/removeBook/${bookId}`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "PATCH",
+    });
+    return res.json();
+};
+
+export const isBookInMyLibrary = async (
+    bookId: string,
+    signal?: AbortSignal
+): Promise<{ isInLibrary: boolean }> => {
+    const res = await defaultFetch(`myLibrary/isBookInLibrary/${bookId}`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "GET",
+        signal,
     });
     return res.json();
 };

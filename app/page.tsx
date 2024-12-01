@@ -1,11 +1,7 @@
 import { AutoCarousel } from "@/components/AutoCarousel";
 import LatestRelease from "@/components/LatestRelease";
-import {
-    TypographyH1,
-    TypographyH2,
-    TypographyH3,
-} from "@/components/ui/typography";
-import { BookIcon, DownloadIcon, GemIcon, SearchIcon } from "lucide-react";
+import { TypographyH1, TypographyH3 } from "@/components/ui/typography";
+import { BookIcon, DownloadIcon, SearchIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -39,15 +35,6 @@ const heroCardContent = [
             </>
         ),
     },
-    {
-        text: "Create your own book with AI",
-        href: "#",
-        icon: (
-            <>
-                <GemIcon size={iconSize} />
-            </>
-        ),
-    },
 ];
 
 const heroCards = heroCardContent.map((item) => (
@@ -70,9 +57,7 @@ const heroLines = [
 
 const heroLineCards = heroLines.map((line) => (
     <div className="h-full">
-        <TypographyH1 className="text-center text-5xl">
-            {line}
-        </TypographyH1>
+        <TypographyH1 className="text-center text-5xl">{line}</TypographyH1>
     </div>
 ));
 

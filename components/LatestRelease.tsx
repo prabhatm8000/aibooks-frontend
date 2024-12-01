@@ -7,6 +7,8 @@ import BookCard from "./BookCard";
 import ErrorPage from "./ErrorPage";
 import HeadingWithUnderline from "./HeadingWithUnderline";
 import LoaderPage from "./Loader/LoaderPage";
+import { CancelAbortMsg } from "@/lib/defaults";
+import { toast } from "@/hooks/use-toast";
 
 const LatestRelease = () => {
     const [loadingLatestBooks, setLoadingLatestBooks] = useState(true);
@@ -23,10 +25,18 @@ const LatestRelease = () => {
         setLoadingLatestBooks(true);
         getLatestReleases(signal)
             .then((res) => setLatestBooks(res))
-            .catch(console.error)
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
             .finally(() => setLoadingLatestBooks(false));
 
-        return () => controller.abort();
+        return () => controller.abort(CancelAbortMsg);
     }, []);
     return (
         <div className="space-y-4">
@@ -35,13 +45,22 @@ const LatestRelease = () => {
             {latestBooks?.length === 0 && !loadingLatestBooks && (
                 <ErrorPage code={500} message="Something went wrong." />
             )}
-            {latestBooks?.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                    {latestBooks.map((book) => (
-                        <BookCard key={book.id} book={book} />
-                    ))}
-                </div>
-            )}
+            <div style={{
+                scrollBehavior: "smooth",
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+                overflowX: "scroll",
+            }}>
+                {latestBooks?.length > 0 && (
+                    <div className="flex items-center w-full gap-4">
+                        {latestBooks.map((book) => (
+                            <div key={book.id} className="min-w-[250px] max-w-[250px]">
+                                <BookCard book={book} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

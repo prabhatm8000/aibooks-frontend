@@ -39,6 +39,10 @@ const footerItems = [
                 name: "Gmail",
                 href: "mailto:workforprabhat1254@gmail.com",
             },
+            {
+                name: "X",
+                href: "#",
+            },
         ],
     },
 ];
@@ -119,7 +123,7 @@ export default function PageLayout({
                         ))}
                         <div className="space-y-1 sm:col-span-2 w-full flex items-center justify-center">
                             <TypographySmall isMuted>
-                                Copyright © 2024 AiBooksy. All Rights Reserved
+                                Copyright © 2024 AiBooks. All Rights Reserved
                             </TypographySmall>
                         </div>
                         <div className="space-y-1 sm:col-span-2 w-full flex items-center justify-center">

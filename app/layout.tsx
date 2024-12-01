@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
     title: "AiBooks",
@@ -24,7 +25,9 @@ export default function RootLayout({
     return (
         // suppressHydrationWarning for next-themes
         <html lang="en" suppressHydrationWarning>
-            <body className={`${font.className} antialiased transition-colors duration-150`}>
+            <body
+                className={`${font.className} antialiased transition-colors duration-150`}
+            >
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="system"
@@ -34,6 +37,7 @@ export default function RootLayout({
                     <RouterContext.Provider value={null}>
                         <PageLayout>{children}</PageLayout>
                     </RouterContext.Provider>
+                    <Toaster />
                 </ThemeProvider>
             </body>
         </html>

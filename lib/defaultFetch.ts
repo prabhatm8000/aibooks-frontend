@@ -1,3 +1,5 @@
+import { toast } from "@/hooks/use-toast";
+
 let urlBackend: string;
 let urlFrontend: string;
 
@@ -34,6 +36,13 @@ export const defaultFetch = async (
     const res = await fetch(`${urlBackend}/api/v1/${endpoint}`, options);
 
     if (!res.ok) {
+        toast({
+            title: "Error",
+            description: res.statusText || "Uh oh! Something went wrong",
+            variant: "destructive",
+        });
+        console.log("shittttttttttttttttttttttttttttttttttt", res.statusText);
+        
         throw new Error(res.statusText);
     }
 

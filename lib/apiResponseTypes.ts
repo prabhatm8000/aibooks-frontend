@@ -47,6 +47,8 @@ export type BookResponse = {
         };
     };
     createdAt: Date;
+    rating: number;
+    totalRatings: number;
 };
 
 export type BooksPageResponse = {
@@ -100,4 +102,10 @@ export type BookRatingResponse = {
     createdAt: Date;
     updatedAt: Date;
     user: UserShortResponse;
+};
+
+export type UserLibraryResponse = {
+    id: string;
+    books: BookResponse[];
+    totalBooks: number;
 };

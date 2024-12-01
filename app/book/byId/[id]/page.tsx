@@ -1,8 +1,10 @@
 "use client";
 
+import BookCard from "@/components/BookCard";
 import ErrorPage from "@/components/ErrorPage";
 import HeadingWithUnderline from "@/components/HeadingWithUnderline";
 import LoaderPage from "@/components/Loader/LoaderPage";
+import LoadingSpinner from "@/components/Loader/LoadingSpinner";
 import ThreeDotLoading from "@/components/Loader/ThreeDotLoading";
 import StarRating from "@/components/StarRating";
 import StarRatingInput from "@/components/StarRatingInput";
@@ -25,14 +27,20 @@ import {
     TypographySmall,
 } from "@/components/ui/typography";
 import UserAvtar from "@/components/UserAvtar";
+import { toast } from "@/hooks/use-toast";
 import {
     addBookRating,
+    addBookToLibrary,
     deleteBookRating,
     getBookById,
     getBookRatings,
+    getRelatedBooks,
+    isBookInMyLibrary,
     myRatingForBook,
+    removeBookFromLibrary,
 } from "@/lib/apiClient";
 import type { BookRatingResponse, BookResponse } from "@/lib/apiResponseTypes";
+import { CancelAbortMsg } from "@/lib/defaults";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { TrashIcon } from "lucide-react";
 import Image from "next/image";
@@ -42,6 +50,75 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 const BookDetailsSection = ({ book }: { book: BookResponse }) => {
+    const [isInLibrary, setIsInLibrary] = useState(false);
+    const [loadingIsInLibrary, setLoadingIsInLibrary] = useState(true);
+
+    const getIsInLibrary = async () => {
+        setLoadingIsInLibrary(true);
+        isBookInMyLibrary(book.id)
+            .then((res) => setIsInLibrary(res.isInLibrary))
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
+            .finally(() => setLoadingIsInLibrary(false));
+    };
+
+    const handleAddToLibrary = async () => {
+        setLoadingIsInLibrary(true);
+        addBookToLibrary(book.id)
+            .then((res) => {
+                toast({
+                    title: "Success",
+                    description: res.message,
+                });
+                setIsInLibrary(true);
+            })
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
+            .finally(() => setLoadingIsInLibrary(false));
+    };
+
+    const handleRemoveFromLibrary = async () => {
+        setLoadingIsInLibrary(true);
+        removeBookFromLibrary(book.id)
+            .then((res) => {
+                toast({
+                    title: "Success",
+                    description: res.message,
+                });
+                setIsInLibrary(false);
+            })
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
+            .finally(() => setLoadingIsInLibrary(false));
+    };
+
+    useEffect(() => {
+        if (book) {
+            getIsInLibrary();
+        }
+    }, [book]);
+
     return (
         <div className="flex flex-col items-center lg:items-start lg:flex-row gap-4 h-full">
             <Image
@@ -62,7 +139,7 @@ const BookDetailsSection = ({ book }: { book: BookResponse }) => {
                         Released on:{" "}
                         {new Date(book.createdAt).toLocaleDateString()}
                     </TypographyP>
-                    <StarRating rating={3.7} outOf={5} />
+                    <StarRating rating={book.rating} outOf={5} />
                     <div className="flex flex-col sm:flex-row gap-2">
                         <ButtonLink
                             href={book.pdfUrl}
@@ -73,10 +150,26 @@ const BookDetailsSection = ({ book }: { book: BookResponse }) => {
                             Read Now
                         </ButtonLink>
                         <Button
-                            variant={"default"}
+                            variant={isInLibrary ? "destructive" : "default"}
                             className="text-lg font-bold"
+                            disabled={loadingIsInLibrary}
+                            onClick={
+                                isInLibrary
+                                    ? handleRemoveFromLibrary
+                                    : handleAddToLibrary
+                            }
                         >
-                            Add to Library
+                            {loadingIsInLibrary ? (
+                                <LoadingSpinner
+                                    className={
+                                        isInLibrary ? "" : "text-background"
+                                    }
+                                />
+                            ) : isInLibrary ? (
+                                "Remove from Library"
+                            ) : (
+                                "Add to Library"
+                            )}
                         </Button>
                     </div>
                     <TypographyP isMuted>{book.summary}</TypographyP>
@@ -86,7 +179,68 @@ const BookDetailsSection = ({ book }: { book: BookResponse }) => {
     );
 };
 
-const RelatedBooksSection = ({ books }: { books: BookResponse[] }) => {};
+const RelatedBooksSection = () => {
+    const params = useParams();
+    const id = params?.id as string;
+
+    const [loadingLatestBooks, setLoadingLatestBooks] = useState(true);
+    const [relatedBooks, setRelatedBooks] = useState<BookResponse[]>([]);
+
+    useEffect(() => {
+        if (relatedBooks.length > 0) {
+            setLoadingLatestBooks(false);
+            return;
+        }
+
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        setLoadingLatestBooks(true);
+        getRelatedBooks(id, 3, signal)
+            .then((res) => {
+                setRelatedBooks(res);
+            })
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
+            .finally(() => setLoadingLatestBooks(false));
+
+        return () => controller.abort(CancelAbortMsg);
+    }, []);
+    return (
+        <div className="space-y-4">
+            <HeadingWithUnderline text="Related Books" />
+            {loadingLatestBooks && <LoaderPage />}
+            {relatedBooks?.length === 0 && !loadingLatestBooks && (
+                <ErrorPage code={500} message="Something went wrong." />
+            )}
+            <div
+                style={{
+                    scrollBehavior: "smooth",
+                    msOverflowStyle: "none",
+                    scrollbarWidth: "none",
+                    overflowX: "scroll",
+                }}
+            >
+                {relatedBooks?.length > 0 && (
+                    <div className="flex items-center w-full gap-4">
+                        {relatedBooks.map((book) => (
+                            <div key={book.id} className="min-w-[250px] max-w-[250px]">
+                                <BookCard book={book} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
 
 const FormSchema = z.object({
     review: z.string().trim(),
@@ -117,13 +271,34 @@ function ReviewInputForm() {
             return;
         }
 
+        if (v.rating === 0 && v.review === "") {
+            form.setError("review", {
+                type: "manual",
+                message: "Review cannot be empty.",
+            });
+
+            form.setError("rating", {
+                type: "manual",
+                message: "Rating cannot be empty.",
+            });
+            return;
+        }
+
         setSubmitLoading(true);
         addBookRating({
             bookId: bookId,
             rating: v.rating,
             review: v.review,
         })
-            .catch((err) => console.error("Error submitting review:", err))
+            .then((res) => {
+                toast({
+                    title: "Success",
+                    description: res.message,
+                    variant: "default",
+                });
+                setGotPrevRating(true);
+            })
+            .catch((err) => toast({ description: err.message }))
             .finally(() => setSubmitLoading(false));
     };
 
@@ -133,29 +308,45 @@ function ReviewInputForm() {
         setIsDeleting(true);
         deleteBookRating(prevRating.id)
             .then((res) => {
-                console.log(res);
+                toast({
+                    title: "Success",
+                    description: res.message,
+                    variant: "default",
+                });
                 setGotPrevRating(false);
                 setPrevRating(null);
                 form.setValue("rating", 0);
                 form.setValue("review", "");
             })
-            .catch((err) => console.error(err))
+            .catch((err) => toast({ description: err.message }))
             .finally(() => setIsDeleting(false));
     };
 
     useEffect(() => {
         if (!bookId) return;
-        
+
         const controller = new AbortController();
         const signal = controller.signal;
 
-        myRatingForBook(bookId, signal).then((res) => {
-            setPrevRating(res);
-            form.setValue("rating", res.rating);
-            form.setValue("review", res.review);
-            setGotPrevRating(true);
-        });
-        return () => controller.abort();
+        myRatingForBook(bookId, signal)
+            .then((res) => {
+                setPrevRating(res);
+                form.setValue("rating", res.rating);
+                form.setValue("review", res.review);
+                setGotPrevRating(true);
+            })
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                }
+            })
+            .finally(() => setSubmitLoading(false));
+
+        return () => controller.abort(CancelAbortMsg);
     }, []);
 
     return (
@@ -176,8 +367,11 @@ function ReviewInputForm() {
                                         onChange={field.onChange}
                                         outOf={5}
                                     />
-                                    {gotPrevRating && (
+                                    {(prevRating?.rating ||
+                                        prevRating?.review) && (
                                         <Button
+                                            type="button"
+                                            title="Delete Rating"
                                             disabled={isDeleting}
                                             variant={"destructive"}
                                             onClick={handleDeleteRating}
@@ -208,7 +402,7 @@ function ReviewInputForm() {
                     )}
                 />
                 <FormDescription>
-                    {gotPrevRating
+                    {prevRating?.rating || prevRating?.review
                         ? "You can update your previous review."
                         : "Share your thoughts about the book."}
                 </FormDescription>
@@ -228,7 +422,7 @@ const ReviewCard = ({ review }: { review: BookRatingResponse }) => {
             className="flex flex-col gap-2 border-b pb-2 w-full"
         >
             <div className="flex items-start justify-start gap-2 w-full">
-                <span className="w-7 h-7 py-1">
+                <span className="size-7 py-1">
                     <UserAvtar size={40} user={review.user} />
                 </span>
                 <div className="flex flex-col items-start justify-start gap-2 w-fit">
@@ -289,13 +483,17 @@ const ReviewsSection = () => {
                 }
             })
             .catch((err) => {
-                if (err.name !== "AbortError") {
-                    console.error("Error fetching reviews:", err);
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
                 }
             })
             .finally(() => setReviewsLoading(false));
 
-        return () => controller.abort();
+        return () => controller.abort(CancelAbortMsg);
     }, [bookId, page, hasMore]);
 
     return (
@@ -323,7 +521,7 @@ const ReviewsSection = () => {
                             Load More
                         </Button>
                     )}
-                    {!hasMore && (
+                    {!hasMore && reviews.length > 0 && (
                         <TypographySmall isMuted className="w-full text-center">
                             No more reviews
                         </TypographySmall>
@@ -339,9 +537,10 @@ const page = () => {
     const id = params?.id as string;
     const [book, setBook] = useState<BookResponse>();
     const [loadingBook, setLoadingBook] = useState<boolean>(true);
+    const [isError, setErrorBook] = useState<boolean>(false);
 
     useEffect(() => {
-        if (!id || book) {
+        if (id && book) {
             setLoadingBook(false);
             return;
         }
@@ -354,19 +553,28 @@ const page = () => {
             .then((res) => {
                 setBook(res);
             })
+            .catch((err) => {
+                if (err !== CancelAbortMsg) {
+                    toast({
+                        title: "Error",
+                        description: err.message,
+                        variant: "destructive",
+                    });
+                    setErrorBook(true);
+                }
+            })
             .finally(() => setLoadingBook(false));
 
-        return () => controller.abort();
+        return () => controller.abort(CancelAbortMsg);
     }, []);
     return (
         <>
-            {!book && !loadingBook && (
-                <ErrorPage code={500} message="Something went wrong" />
-            )}
+            {isError && <ErrorPage code={500} message="Something went wrong" />}
             {loadingBook && <LoaderPage />}
             {book && (
                 <div className="flex flex-col gap-5 mt-4">
                     <BookDetailsSection book={book} />
+                    <RelatedBooksSection />
                     <ReviewsSection />
                 </div>
             )}
