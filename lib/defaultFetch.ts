@@ -1,16 +1,13 @@
 import { toast } from "@/hooks/use-toast";
 
 let urlBackend: string;
-let urlFrontend: string;
 
 switch (process.env.NEXT_PUBLIC_MODE) {
     case "dev":
         urlBackend = process.env.NEXT_PUBLIC_LOCAL_BACKEND_URL || "";
-        urlFrontend = process.env.NEXT_PUBLIC_LOCAL_FRONTEND_URL || "";
         break;
     case "prod":
         urlBackend = process.env.NEXT_PUBLIC_PROD_BACKEND_URL || "";
-        urlFrontend = process.env.NEXT_PUBLIC_PROD_FRONTEND_URL || "";
         break;
     default:
         throw new Error("Invalid mode");

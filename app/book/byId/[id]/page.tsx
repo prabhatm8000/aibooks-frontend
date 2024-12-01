@@ -252,7 +252,6 @@ function ReviewInputForm() {
 
     const [submitLoading, setSubmitLoading] = useState<boolean>(false);
     const [isDeleting, setIsDeleting] = useState(false);
-    const [gotPrevRating, setGotPrevRating] = useState(false);
     const [prevRating, setPrevRating] = useState<BookRatingResponse | null>(
         null
     );
@@ -296,7 +295,6 @@ function ReviewInputForm() {
                     description: res.message,
                     variant: "default",
                 });
-                setGotPrevRating(true);
             })
             .catch((err) => toast({ description: err.message }))
             .finally(() => setSubmitLoading(false));
@@ -313,7 +311,6 @@ function ReviewInputForm() {
                     description: res.message,
                     variant: "default",
                 });
-                setGotPrevRating(false);
                 setPrevRating(null);
                 form.setValue("rating", 0);
                 form.setValue("review", "");
@@ -333,7 +330,6 @@ function ReviewInputForm() {
                 setPrevRating(res);
                 form.setValue("rating", res.rating);
                 form.setValue("review", res.review);
-                setGotPrevRating(true);
             })
             .catch((err) => {
                 if (err !== CancelAbortMsg) {
@@ -532,7 +528,7 @@ const ReviewsSection = () => {
     );
 };
 
-const page = () => {
+const Page =() => {
     const params = useParams();
     const id = params?.id as string;
     const [book, setBook] = useState<BookResponse>();
@@ -582,4 +578,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

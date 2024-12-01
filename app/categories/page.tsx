@@ -27,7 +27,7 @@ const CategoriesSection = ({ categories }: { categories: string[] }) => {
     );
 };
 
-const page = () => {
+const Page =() => {
     const { categories, setCategories } = useCategoriesStore();
     const [loadingCategories, setLoadingCategories] = useState<boolean>(true);
 
@@ -77,4 +77,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

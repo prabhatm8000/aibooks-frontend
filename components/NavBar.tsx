@@ -421,7 +421,7 @@ const UserButton = () => {
                                     );
                                 } else {
                                     return (
-                                        <TypographySmall>
+                                        <TypographySmall key={index}>
                                             {item.label}
                                         </TypographySmall>
                                     );

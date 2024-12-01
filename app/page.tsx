@@ -37,8 +37,8 @@ const heroCardContent = [
     },
 ];
 
-const heroCards = heroCardContent.map((item) => (
-    <div className="bg-background/20 w-full h-full flex items-center justify-center rounded-lg p-4">
+const heroCards = heroCardContent.map((item, index) => (
+    <div key={index} className="bg-background/20 w-full h-full flex items-center justify-center rounded-lg p-4">
         <Link
             href={item.href}
             className="flex flex-col items-center justify-center gap-2"
@@ -55,8 +55,8 @@ const heroLines = [
     "Where AI Meets Storytelling: Discover Worlds Only Machines Can Imagine.",
 ];
 
-const heroLineCards = heroLines.map((line) => (
-    <div className="h-full">
+const heroLineCards = heroLines.map((line, index) => (
+    <div key={index} className="h-full">
         <TypographyH1 className="text-center text-5xl">{line}</TypographyH1>
     </div>
 ));

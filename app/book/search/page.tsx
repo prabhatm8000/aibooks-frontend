@@ -4,7 +4,7 @@ import BookCard from "@/components/BookCard";
 import ErrorPage from "@/components/ErrorPage";
 import HeadingWithUnderline from "@/components/HeadingWithUnderline";
 import ThreeDotLoading from "@/components/Loader/ThreeDotLoading";
-import { TypographyH3, TypographyH4 } from "@/components/ui/typography";
+import { TypographyH4 } from "@/components/ui/typography";
 import { toast } from "@/hooks/use-toast";
 import { searchBooks } from "@/lib/apiClient";
 import type { BookResponse } from "@/lib/apiResponseTypes";
@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const SEARCHLIMIT = 10;
 
-const page = () => {
+const Page =() => {
     const query = useSearchParams();
     const searchQuery = query.get("q");
 
@@ -149,4 +149,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;

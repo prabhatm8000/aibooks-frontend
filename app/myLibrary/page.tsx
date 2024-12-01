@@ -31,7 +31,7 @@ const RemoveBtn = ({ onClick }: { onClick: () => void }) => {
     );
 };
 
-const page = () => {
+const Page =() => {
     const [library, setLibrary] = useState<UserLibraryResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
@@ -175,4 +175,4 @@ const page = () => {
     );
 };
 
-export default page;
+export default Page;
