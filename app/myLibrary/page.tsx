@@ -1,10 +1,10 @@
 "use client";
 
-import BookCard from "@/components/BookCard";
-import ErrorPage from "@/components/ErrorPage";
-import HeadingWithUnderline from "@/components/HeadingWithUnderline";
-import ThreeDotLoading from "@/components/Loader/ThreeDotLoading";
-import { TypographyH4, TypographyH5 } from "@/components/ui/typography";
+import BookCard from "@/app/components/BookCard";
+import ErrorPage from "@/app/components/ErrorPage";
+import HeadingWithUnderline from "@/app/components/HeadingWithUnderline";
+import ThreeDotLoading from "@/app/components/Loader/ThreeDotLoading";
+import { TypographyH4, TypographyH5 } from "@/app/components/ui/typography";
 import { toast } from "@/hooks/use-toast";
 import { getLibrary, removeBookFromLibrary } from "@/lib/apiClient";
 import type { UserLibraryResponse } from "@/lib/apiResponseTypes";

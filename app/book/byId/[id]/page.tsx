@@ -1,15 +1,15 @@
 "use client";
 
-import BookCard from "@/components/BookCard";
-import ErrorPage from "@/components/ErrorPage";
-import HeadingWithUnderline from "@/components/HeadingWithUnderline";
-import LoaderPage from "@/components/Loader/LoaderPage";
-import LoadingSpinner from "@/components/Loader/LoadingSpinner";
-import ThreeDotLoading from "@/components/Loader/ThreeDotLoading";
-import StarRating from "@/components/StarRating";
-import StarRatingInput from "@/components/StarRatingInput";
-import { Button } from "@/components/ui/button";
-import { ButtonLink } from "@/components/ui/buttonlink";
+import BookCard from "@/app/components/BookCard";
+import ErrorPage from "@/app/components/ErrorPage";
+import HeadingWithUnderline from "@/app/components/HeadingWithUnderline";
+import LoaderPage from "@/app/components/Loader/LoaderPage";
+import LoadingSpinner from "@/app/components/Loader/LoadingSpinner";
+import ThreeDotLoading from "@/app/components/Loader/ThreeDotLoading";
+import StarRating from "@/app/components/StarRating";
+import StarRatingInput from "@/app/components/StarRatingInput";
+import { Button } from "@/app/components/ui/button";
+import { ButtonLink } from "@/app/components/ui/buttonlink";
 import {
     Form,
     FormControl,
@@ -17,16 +17,16 @@ import {
     FormField,
     FormItem,
     FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
+} from "@/app/components/ui/form";
+import { Textarea } from "@/app/components/ui/textarea";
 import {
     TypographyH1,
     TypographyH3,
     TypographyH5,
     TypographyP,
     TypographySmall,
-} from "@/components/ui/typography";
-import UserAvtar from "@/components/UserAvtar";
+} from "@/app/components/ui/typography";
+import UserAvtar from "@/app/components/UserAvtar";
 import { toast } from "@/hooks/use-toast";
 import {
     addBookRating,

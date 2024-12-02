@@ -8,7 +8,7 @@ import {
     CarouselItem,
     CarouselNext,
     CarouselPrevious,
-} from "@/components/ui/carousel";
+} from "@/app/components/ui/carousel";
 
 export function AutoCarousel({
     cardContents,

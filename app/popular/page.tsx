@@ -1,4 +1,4 @@
-import LoaderPage from "@/components/Loader/LoaderPage";
+import LoaderPage from "@/app/components/Loader/LoaderPage";
 
 const Page =() => {
     return <LoaderPage />;

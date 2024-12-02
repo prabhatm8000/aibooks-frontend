@@ -1,10 +1,10 @@
-import { ThemeProvider } from "@/components/ThemeProvider";
-import PageLayout from "@/components/PageLayout";
+import { ThemeProvider } from "@/app/components/ThemeProvider";
+import PageLayout from "@/app/components/PageLayout";
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/app/components/ui/toaster";
 
 export const metadata: Metadata = {
     title: "AiBooks",

@@ -1,12 +1,12 @@
 "use client";
 
-import NavBar from "@/components/NavBar";
-import SideBar, { sideBarItems } from "@/components/SideBar";
+import NavBar from "@/app/components/NavBar";
+import SideBar, { sideBarItems } from "@/app/components/SideBar";
 import {
     TypographyH2,
     TypographyH4,
     TypographySmall,
-} from "@/components/ui/typography";
+} from "@/app/components/ui/typography";
 import Link from "next/link";
 import { useState } from "react";
 

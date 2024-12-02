@@ -1,9 +1,9 @@
 "use client";
 
-import ErrorPage from "@/components/ErrorPage";
-import HeadingWithUnderline from "@/components/HeadingWithUnderline";
-import LoaderPage from "@/components/Loader/LoaderPage";
-import { TypographySmall } from "@/components/ui/typography";
+import ErrorPage from "@/app/components/ErrorPage";
+import HeadingWithUnderline from "@/app/components/HeadingWithUnderline";
+import LoaderPage from "@/app/components/Loader/LoaderPage";
+import { TypographySmall } from "@/app/components/ui/typography";
 import { toast } from "@/hooks/use-toast";
 import useCategoriesStore from "@/hooks/zustand/useCategoriesStore";
 import { getCategories } from "@/lib/apiClient";

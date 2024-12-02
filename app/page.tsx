@@ -1,6 +1,6 @@
-import { AutoCarousel } from "@/components/AutoCarousel";
-import LoaderPage from "@/components/Loader/LoaderPage";
-import { TypographyH1, TypographyH3 } from "@/components/ui/typography";
+import { AutoCarousel } from "@/app/components/AutoCarousel";
+import LoaderPage from "@/app/components/Loader/LoaderPage";
+import { TypographyH1, TypographyH3 } from "@/app/components/ui/typography";
 import { BookIcon, DownloadIcon, SearchIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -86,7 +86,7 @@ const HeroSection = () => {
 };
 
 const DynamicLatestRelease = dynamic(
-    () => import("../components/LatestRelease"),
+    () => import("./components/LatestRelease"),
     {
         loading: () => <LoaderPage />,
     }
