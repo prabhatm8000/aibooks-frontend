@@ -1,7 +1,8 @@
 import { AutoCarousel } from "@/components/AutoCarousel";
-import LatestRelease from "@/components/LatestRelease";
+import LoaderPage from "@/components/Loader/LoaderPage";
 import { TypographyH1, TypographyH3 } from "@/components/ui/typography";
 import { BookIcon, DownloadIcon, SearchIcon } from "lucide-react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -38,7 +39,10 @@ const heroCardContent = [
 ];
 
 const heroCards = heroCardContent.map((item, index) => (
-    <div key={index} className="bg-background/20 w-full h-full flex items-center justify-center rounded-lg p-4">
+    <div
+        key={index}
+        className="bg-background/20 w-full h-full flex items-center justify-center rounded-lg p-4"
+    >
         <Link
             href={item.href}
             className="flex flex-col items-center justify-center gap-2"
@@ -81,11 +85,18 @@ const HeroSection = () => {
     );
 };
 
+const DynamicLatestRelease = dynamic(
+    () => import("../components/LatestRelease"),
+    {
+        loading: () => <LoaderPage />,
+    }
+);
+
 const MainSection = () => {
     return (
         <div className="flex flex-col gap-8">
             <HeroSection />
-            <LatestRelease />
+            <DynamicLatestRelease />
             <div className="text-center h-full w-full rounded-lg bg-background/20 text-foreground">
                 <AutoCarousel cardContents={heroCards} />
             </div>
