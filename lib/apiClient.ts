@@ -1,3 +1,5 @@
+"use client";
+
 import type {
     BookRatingPayload,
     BookRatingResponse,
@@ -29,6 +31,7 @@ export const login = async (): Promise<{ authUrl: string }> => {
         body: JSON.stringify({ currentUrl: window.location.href }),
     });
 
+
     return res.json();
 };
 
@@ -50,6 +53,7 @@ export const getUser = async (): Promise<UserAuthResponse> => {
         },
         method: "GET",
     });
+
 
     return res.json();
 };

@@ -38,8 +38,6 @@ export const defaultFetch = async (
             description: res.statusText || "Uh oh! Something went wrong",
             variant: "destructive",
         });
-        console.log("shittttttttttttttttttttttttttttttttttt", res.statusText);
-        
         throw new Error(res.statusText);
     }
 
