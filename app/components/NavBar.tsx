@@ -356,9 +356,25 @@ const UserButton = () => {
     return (
         <>
             {!user ? (
-                <Button onClick={signUpButtonHandler} variant={"default"}>
-                    <TypographyH5>Sign in</TypographyH5>
-                </Button>
+                <>
+                    <Button onClick={signUpButtonHandler} variant={"default"}>
+                        <TypographyH5>Sign in</TypographyH5>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            logout()
+                                .then((data) => {
+                                    resetUser();
+                                    window.location.href = data.authUrl;
+                                })
+                                .catch((err) => console.log(err))
+                                .finally(() => console.log("done"));
+                        }}
+                        variant={"default"}
+                    >
+                        <TypographyH5>out</TypographyH5>
+                    </Button>
+                </>
             ) : (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
