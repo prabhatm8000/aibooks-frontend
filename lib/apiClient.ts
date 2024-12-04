@@ -29,10 +29,12 @@ export const login = async (): Promise<{ authUrl: string }> => {
         },
         method: "POST",
         body: JSON.stringify({ currentUrl: window.location.href }),
+        credentials: "include",
     });
 
-
-    return res.json();
+    const { authUrl, cookie } = await res.json();
+    document.cookie = cookie;
+    return { authUrl };
 };
 
 export const logout = async (): Promise<{ authUrl: string }> => {
@@ -41,6 +43,7 @@ export const logout = async (): Promise<{ authUrl: string }> => {
             "Content-Type": "application/json",
         },
         method: "GET",
+        credentials: "include",
     });
 
     return res.json();
@@ -53,7 +56,6 @@ export const getUser = async (): Promise<UserAuthResponse> => {
         },
         method: "GET",
     });
-
 
     return res.json();
 };
