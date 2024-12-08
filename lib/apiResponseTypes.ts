@@ -62,29 +62,13 @@ export type BooksPageResponse = {
 };
 
 export type UserAuthResponse = {
-    aud: string;
+    id: string;
     email: string;
     email_verified: boolean;
-    exp: number;
-    family_name: string;
-    given_name: string;
-    iat: number;
-    iss: string;
-    name: string;
-    nickname: string;
-    picture: string;
-    sid: string;
-    sub: string;
-    updated_at: string;
-};
-
-export type UserShortResponse = {
-    id: string;
-    name: string;
-    given_name: string;
-    family_name: string;
-    picture: string;
-    nickname: string;
+    first_name: string;
+    last_name: string;
+    password: string;
+    updatedAt: Date;
 };
 
 export type BookRatingPayload = {
@@ -101,7 +85,7 @@ export type BookRatingResponse = {
     review: string;
     createdAt: Date;
     updatedAt: Date;
-    user: UserShortResponse;
+    user: UserAuthResponse;
 };
 
 export type UserLibraryResponse = {

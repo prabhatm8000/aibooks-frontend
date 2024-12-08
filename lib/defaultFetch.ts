@@ -32,6 +32,10 @@ export const defaultFetch = async (
 
     const res = await fetch(`${urlBackend}/api/v1/${endpoint}`, options);
 
+    if (res.status === 401) {
+        throw new Error("Unauthorized");
+    }
+
     if (!res.ok) {
         toast({
             title: "Error",

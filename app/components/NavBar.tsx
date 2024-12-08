@@ -5,11 +5,8 @@ import {
     LibraryIcon,
     LogOutIcon,
     MenuIcon,
-    Moon,
     Search,
-    Sun,
 } from "lucide-react";
-import { useTheme } from "next-themes";
 
 import { Button } from "@/app/components/ui/button";
 import {
@@ -27,13 +24,15 @@ import {
 } from "./ui/typography";
 
 import useUserAuthStore from "@/hooks/zustand/useUserAuthStore";
-import { getSearchSuggestions, getUser, login, logout } from "@/lib/apiClient";
+import { getSearchSuggestions, getUser, logout } from "@/lib/apiClient";
 import Image from "next/image";
-import LoadingSpinner from "./Loader/LoadingSpinner";
-import { ButtonLink } from "./ui/buttonlink";
-import UserAvtar from "./UserAvtar";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import LoadingSpinner from "./Loader/LoadingSpinner";
+import { ButtonLink } from "./ui/buttonlink";
+import ToggleThemeButton from "./ui/toogleThemeBtn";
+import UserAvtar from "./UserAvtar";
+import { widthStyle } from "./PageLayout";
 
 type SuggestionsType = {
     id: string;
@@ -56,126 +55,6 @@ type SuggestionsType = {
     isDisabled?: boolean;
     href?: string;
 };
-
-export default function NavBar({
-    onMenuBtnClick,
-}: {
-    onMenuBtnClick: () => void;
-}) {
-    const router = useRouter();
-    const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
-
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [loadingSuggestions, setLoadingSuggestions] =
-        useState<boolean>(false);
-    const [searchSuggestionsList, setSearchSuggestionsList] = useState<
-        SuggestionsType[]
-    >([]);
-
-    // #region [handling focus & key bindings]
-    useEffect(() => {
-        const focusSearchInput = (ev: KeyboardEvent) => {
-            if (ev.ctrlKey && ev.key === "k") {
-                ev.preventDefault();
-                setIsSearchInputFocused(true);
-            } else if (ev.key === "Escape") {
-                setIsSearchInputFocused(false);
-            } else if (
-                ev.key === "Enter" &&
-                isSearchInputFocused &&
-                searchQuery.length > 0
-            ) {
-                ev.preventDefault();
-                setIsSearchInputFocused(false);
-                router.push(`/book/search?q=${searchQuery}`);
-            }
-        };
-
-        addEventListener("keydown", focusSearchInput);
-
-        return () => {
-            removeEventListener("keydown", focusSearchInput);
-        };
-    }, [searchQuery]);
-    // #endregion
-
-    // #region [handling suggestions]
-    useEffect(() => {
-        const populate = () => {
-            if (searchQuery.length === 0) {
-                setLoadingSuggestions(false);
-                return;
-            }
-            setLoadingSuggestions(true);
-            getSearchSuggestions(searchQuery, 5)
-                .then((res) => {
-                    const list: SuggestionsType[] = res.map((item) => ({
-                        id: item.id,
-                        label: item.title,
-                        label2: item.genre.join(", "),
-                        icon: item.coverImage,
-                        isDisabled: false,
-                        href: `/book/byId/${item.id}`,
-                    }));
-                    setSearchSuggestionsList(list);
-                })
-                .finally(() => setLoadingSuggestions(false));
-        };
-
-        const timeout = setTimeout(populate, 500);
-
-        return () => {
-            clearTimeout(timeout);
-        };
-    }, [searchQuery]);
-    // #endregion
-
-    return (
-        <header className="sticky top-0 mx-auto z-50 bg-gradient-to-b from-background from-[75%] to-background/0 w-full">
-            <nav className="flex justify-between gap-4 items-center py-4">
-                <div className="flex items-center gap-2 md:hidden">
-                    <Button
-                        variant={"ghost"}
-                        size={"icon"}
-                        onClick={onMenuBtnClick}
-                    >
-                        <MenuIcon />
-                    </Button>
-                    <TypographyH3>AiBooks</TypographyH3>
-                </div>
-
-                <div className="flex items-center justify-end md:justify-between gap-4 w-full pb-2">
-                    <div className="hidden md:block w-1/2">
-                        <SearchWithSuggestions
-                            isSearchInputFocused={isSearchInputFocused}
-                            setIsSearchInputFocused={setIsSearchInputFocused}
-                            placeholder="Search (ctrl+k)..."
-                            value={searchQuery}
-                            onValueChange={(v) => setSearchQuery(v)}
-                            loadingList={loadingSuggestions}
-                            list={searchSuggestionsList}
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <UserButton />
-                        <ToggleThemeButton />
-                    </div>
-                </div>
-            </nav>
-            <div className="block md:hidden pb-8 w-full">
-                <SearchWithSuggestions
-                    isSearchInputFocused={isSearchInputFocused}
-                    setIsSearchInputFocused={setIsSearchInputFocused}
-                    placeholder="Search (ctrl+k)..."
-                    value={searchQuery}
-                    onValueChange={(v) => setSearchQuery(v)}
-                    loadingList={loadingSuggestions}
-                    list={searchSuggestionsList}
-                />
-            </div>
-        </header>
-    );
-}
 
 function SearchWithSuggestions({
     isSearchInputFocused,
@@ -307,6 +186,7 @@ function SearchWithSuggestions({
 
 const UserButton = () => {
     const { user, setUser, resetUser } = useUserAuthStore();
+    const router = useRouter();
     const userActions = [
         {
             label: "My Library",
@@ -324,9 +204,8 @@ const UserButton = () => {
             onClickHandler: (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
                 logout()
-                    .then((data) => {
+                    .then(() => {
                         resetUser();
-                        window.location.href = data.authUrl;
                     })
                     .catch((err) => console.log(err))
                     .finally(() => console.log("done"));
@@ -341,10 +220,8 @@ const UserButton = () => {
 
     const signUpButtonHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        login()
-            .then((data) => (window.location.href = data.authUrl))
-            .catch((err) => console.log(err))
-            .finally(() => console.log("done"));
+        localStorage.setItem("prevPath", window.location.pathname);
+        router.push("/sign-in");
     };
 
     useEffect(() => {
@@ -356,25 +233,9 @@ const UserButton = () => {
     return (
         <>
             {!user ? (
-                <>
-                    <Button onClick={signUpButtonHandler} variant={"default"}>
-                        <TypographyH5>Sign in</TypographyH5>
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            logout()
-                                .then((data) => {
-                                    resetUser();
-                                    window.location.href = data.authUrl;
-                                })
-                                .catch((err) => console.log(err))
-                                .finally(() => console.log("done"));
-                        }}
-                        variant={"default"}
-                    >
-                        <TypographyH5>out</TypographyH5>
-                    </Button>
-                </>
+                <Button variant={"default"} onClick={signUpButtonHandler}>
+                    <TypographyH5>Sign in</TypographyH5>
+                </Button>
             ) : (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -382,7 +243,7 @@ const UserButton = () => {
                             variant="outline"
                             size="icon"
                             className="rounded-full size-10 border-0"
-                            title={`${user.given_name} ${user.family_name}`}
+                            title={`${user.first_name} ${user.last_name}`}
                         >
                             <UserAvtar size={40} user={user} />
                         </Button>
@@ -395,9 +256,11 @@ const UserButton = () => {
                             <div className="flex items-center gap-3 mt-1.5 mb-3">
                                 <UserAvtar size={75} user={user} />
                                 <div className="">
-                                    <TypographyH3>{user.name}</TypographyH3>
+                                    <TypographyH3>
+                                        {user.first_name} {user.last_name}
+                                    </TypographyH3>
                                     <TypographySmall>
-                                        {user.email || user.nickname}
+                                        {user.email}
                                     </TypographySmall>
                                 </div>
                             </div>
@@ -451,48 +314,128 @@ const UserButton = () => {
     );
 };
 
-function ToggleThemeButton() {
-    const { setTheme, theme } = useTheme();
+export default function NavBar({
+    onMenuBtnClick,
+}: {
+    onMenuBtnClick: () => void;
+}) {
+    const router = useRouter();
+    const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
 
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [loadingSuggestions, setLoadingSuggestions] =
+        useState<boolean>(false);
+    const [searchSuggestionsList, setSearchSuggestionsList] = useState<
+        SuggestionsType[]
+    >([]);
+
+    // #region [handling focus & key bindings]
     useEffect(() => {
-        const changeTheme = (ev: KeyboardEvent) => {
-            if (ev.ctrlKey && ev.key === "m") {
-                setTheme(theme === "dark" ? "light" : "dark");
+        const focusSearchInput = (ev: KeyboardEvent) => {
+            if (ev.ctrlKey && ev.key === "k") {
+                ev.preventDefault();
+                setIsSearchInputFocused(true);
+            } else if (ev.key === "Escape") {
+                setIsSearchInputFocused(false);
+            } else if (
+                ev.key === "Enter" &&
+                isSearchInputFocused &&
+                searchQuery.length > 0
+            ) {
+                ev.preventDefault();
+                setIsSearchInputFocused(false);
+                router.push(`/book/search?q=${searchQuery}`);
             }
         };
 
-        addEventListener("keydown", changeTheme);
+        addEventListener("keydown", focusSearchInput);
 
         return () => {
-            removeEventListener("keydown", changeTheme);
+            removeEventListener("keydown", focusSearchInput);
         };
-    }, [theme]);
+    }, [searchQuery]);
+    // #endregion
+
+    // #region [handling suggestions]
+    useEffect(() => {
+        const populate = () => {
+            if (searchQuery.length === 0) {
+                setLoadingSuggestions(false);
+                return;
+            }
+            setLoadingSuggestions(true);
+            getSearchSuggestions(searchQuery, 5)
+                .then((res) => {
+                    const list: SuggestionsType[] = res.map((item) => ({
+                        id: item.id,
+                        label: item.title,
+                        label2: item.genre.join(", "),
+                        icon: item.coverImage,
+                        isDisabled: false,
+                        href: `/book/byId/${item.id}`,
+                    }));
+                    setSearchSuggestionsList(list);
+                })
+                .finally(() => setLoadingSuggestions(false));
+        };
+
+        const timeout = setTimeout(populate, 500);
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [searchQuery]);
+    // #endregion
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button
-                    variant="outline"
-                    size="icon"
-                    className="size-10 p-2 rounded-full"
-                    title="Toggle theme (ctrl+m)"
-                >
-                    <Sun className="size-6 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme("light")}>
-                    Light
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("dark")}>
-                    Dark
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme("system")}>
-                    System
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="main-margin sticky top-0 z-50 bg-gradient-to-b from-background from-[75%] to-background/0">
+            <div className="mx-auto" style={{ ...widthStyle }}>
+                <header className="w-full px-4">
+                    <nav className="flex justify-between gap-4 items-center py-4">
+                        <div className="flex items-center gap-2 md:hidden">
+                            <Button
+                                variant={"ghost"}
+                                size={"icon"}
+                                onClick={onMenuBtnClick}
+                            >
+                                <MenuIcon />
+                            </Button>
+                            <TypographyH3>AiBooks</TypographyH3>
+                        </div>
+
+                        <div className="flex items-center justify-end md:justify-between gap-4 w-full pb-2">
+                            <div className="hidden md:block w-1/2">
+                                <SearchWithSuggestions
+                                    isSearchInputFocused={isSearchInputFocused}
+                                    setIsSearchInputFocused={
+                                        setIsSearchInputFocused
+                                    }
+                                    placeholder="Search (ctrl+k)..."
+                                    value={searchQuery}
+                                    onValueChange={(v) => setSearchQuery(v)}
+                                    loadingList={loadingSuggestions}
+                                    list={searchSuggestionsList}
+                                />
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <UserButton />
+                                <ToggleThemeButton />
+                            </div>
+                        </div>
+                    </nav>
+                    <div className="block md:hidden pb-8 w-full">
+                        <SearchWithSuggestions
+                            isSearchInputFocused={isSearchInputFocused}
+                            setIsSearchInputFocused={setIsSearchInputFocused}
+                            placeholder="Search (ctrl+k)..."
+                            value={searchQuery}
+                            onValueChange={(v) => setSearchQuery(v)}
+                            loadingList={loadingSuggestions}
+                            list={searchSuggestionsList}
+                        />
+                    </div>
+                </header>
+            </div>
+        </div>
     );
 }

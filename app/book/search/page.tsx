@@ -4,6 +4,7 @@ import BookCard from "@/app/components/BookCard";
 import ErrorPage from "@/app/components/ErrorPage";
 import HeadingWithUnderline from "@/app/components/HeadingWithUnderline";
 import ThreeDotLoading from "@/app/components/Loader/ThreeDotLoading";
+import PageLayout from "@/app/components/PageLayout";
 import { TypographyH4 } from "@/app/components/ui/typography";
 import { toast } from "@/hooks/use-toast";
 import { searchBooks } from "@/lib/apiClient";
@@ -14,7 +15,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const SEARCHLIMIT = 10;
 
-const Page =() => {
+const Page = () => {
     const query = useSearchParams();
     const searchQuery = query.get("q");
 
@@ -107,45 +108,47 @@ const Page =() => {
     }, [searchTerm, page]);
 
     return (
-        <div className="flex flex-col gap-4">
-            {!searchQuery ? (
-                <ErrorPage code={400} message="Search query not found." />
-            ) : (
-                <HeadingWithUnderline>
-                    <span>Search results for: </span>
-                    <span className="italic">{searchQuery}</span>
-                </HeadingWithUnderline>
-            )}
+        <PageLayout>
+            <div className="flex flex-col gap-4">
+                {!searchQuery ? (
+                    <ErrorPage code={400} message="Search query not found." />
+                ) : (
+                    <HeadingWithUnderline>
+                        <span>Search results for: </span>
+                        <span className="italic">{searchQuery}</span>
+                    </HeadingWithUnderline>
+                )}
 
-            {!loading && gotError && (
-                <ErrorPage code={500} message={"Something went wrong."} />
-            )}
+                {!loading && gotError && (
+                    <ErrorPage code={500} message={"Something went wrong."} />
+                )}
 
-            {!loading && searchResults.length === 0 && (
-                <div className="w-full h-80 flex items-center justify-center">
-                    <TypographyH4 isMuted>No results found.</TypographyH4>
+                {!loading && searchResults.length === 0 && (
+                    <div className="w-full h-80 flex items-center justify-center">
+                        <TypographyH4 isMuted>No results found.</TypographyH4>
+                    </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    {searchResults.map((book, index) =>
+                        index === searchResults.length - 1 ? (
+                            <BookCard
+                                key={book.id}
+                                ref={resultObserverRef}
+                                book={book}
+                            />
+                        ) : (
+                            <BookCard key={book.id} book={book} />
+                        )
+                    )}
                 </div>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                {searchResults.map((book, index) =>
-                    index === searchResults.length - 1 ? (
-                        <BookCard
-                            key={book.id}
-                            ref={resultObserverRef}
-                            book={book}
-                        />
-                    ) : (
-                        <BookCard key={book.id} book={book} />
-                    )
+
+                {loading && (
+                    <div className="w-full h-80 flex items-center justify-center">
+                        <ThreeDotLoading />
+                    </div>
                 )}
             </div>
-
-            {loading && (
-                <div className="w-full h-80 flex items-center justify-center">
-                    <ThreeDotLoading />
-                </div>
-            )}
-        </div>
+        </PageLayout>
     );
 };
 

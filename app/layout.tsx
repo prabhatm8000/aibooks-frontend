@@ -1,10 +1,9 @@
 import { ThemeProvider } from "@/app/components/ThemeProvider";
-import PageLayout from "@/app/components/PageLayout";
+import { Toaster } from "@/app/components/ui/toaster";
 import type { Metadata } from "next";
+import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
-import { Toaster } from "@/app/components/ui/toaster";
 
 export const metadata: Metadata = {
     title: "AiBooks",
@@ -35,7 +34,7 @@ export default function RootLayout({
                     disableTransitionOnChange
                 >
                     <RouterContext.Provider value={null}>
-                        <PageLayout>{children}</PageLayout>
+                        {children}
                     </RouterContext.Provider>
                     <Toaster />
                 </ThemeProvider>

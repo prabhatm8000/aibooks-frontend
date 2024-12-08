@@ -11,6 +11,7 @@ import type { UserLibraryResponse } from "@/lib/apiResponseTypes";
 import { CancelAbortMsg } from "@/lib/defaults";
 import { TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import PageLayout from "../components/PageLayout";
 
 const LIMIT = 10;
 
@@ -31,7 +32,7 @@ const RemoveBtn = ({ onClick }: { onClick: () => void }) => {
     );
 };
 
-const Page =() => {
+const Page = () => {
     const [library, setLibrary] = useState<UserLibraryResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [hasMore, setHasMore] = useState<boolean>(true);
@@ -130,48 +131,50 @@ const Page =() => {
     }, [page]);
 
     return (
-        <div className="flex flex-col gap-4">
-            <div>
-                <HeadingWithUnderline text="My Library" />
-                <TypographyH5>{`${
-                    library?.totalBooks || 0
-                } books`}</TypographyH5>
-            </div>
-            {!loading && gotError && (
-                <ErrorPage code={500} message={"Something went wrong."} />
-            )}
-            {!loading && library?.books.length === 0 && (
-                <div className="w-full h-80 flex items-center justify-center">
-                    <TypographyH4 isMuted>No books found</TypographyH4>
+        <PageLayout>
+            <div className="flex flex-col gap-4">
+                <div>
+                    <HeadingWithUnderline text="My Library" />
+                    <TypographyH5>{`${
+                        library?.totalBooks || 0
+                    } books`}</TypographyH5>
                 </div>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-                {library?.books.map((book, index) =>
-                    index === library.books.length - 1 ? (
-                        <BookCard
-                            key={book.id}
-                            ref={resultObserverRef}
-                            book={book}
-                        >
-                            <RemoveBtn
-                                onClick={() => handleRemoveBtn(book.id)}
-                            />
-                        </BookCard>
-                    ) : (
-                        <BookCard key={book.id} book={book}>
-                            <RemoveBtn
-                                onClick={() => handleRemoveBtn(book.id)}
-                            />
-                        </BookCard>
-                    )
+                {!loading && gotError && (
+                    <ErrorPage code={500} message={"Something went wrong."} />
+                )}
+                {!loading && library?.books.length === 0 && (
+                    <div className="w-full h-80 flex items-center justify-center">
+                        <TypographyH4 isMuted>No books found</TypographyH4>
+                    </div>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                    {library?.books.map((book, index) =>
+                        index === library.books.length - 1 ? (
+                            <BookCard
+                                key={book.id}
+                                ref={resultObserverRef}
+                                book={book}
+                            >
+                                <RemoveBtn
+                                    onClick={() => handleRemoveBtn(book.id)}
+                                />
+                            </BookCard>
+                        ) : (
+                            <BookCard key={book.id} book={book}>
+                                <RemoveBtn
+                                    onClick={() => handleRemoveBtn(book.id)}
+                                />
+                            </BookCard>
+                        )
+                    )}
+                </div>
+                {loading && (
+                    <div className="w-full h-80 flex items-center justify-center">
+                        <ThreeDotLoading />
+                    </div>
                 )}
             </div>
-            {loading && (
-                <div className="w-full h-80 flex items-center justify-center">
-                    <ThreeDotLoading />
-                </div>
-            )}
-        </div>
+        </PageLayout>
     );
 };
 

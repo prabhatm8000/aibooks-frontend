@@ -10,6 +10,7 @@ import { getCategories } from "@/lib/apiClient";
 import { CancelAbortMsg } from "@/lib/defaults";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import PageLayout from "../components/PageLayout";
 
 const CategoriesSection = ({ categories }: { categories: string[] }) => {
     return (
@@ -61,7 +62,7 @@ const Page =() => {
         return () => controller.abort(CancelAbortMsg);
     }, []);
     return (
-        <>
+        <PageLayout>
             {Array.isArray(categories?.data) &&
                 categories?.data?.length > 0 && (
                     <div className="flex flex-col gap-4 h-full">
@@ -73,7 +74,7 @@ const Page =() => {
             {categories?.data?.length === 0 && !loadingCategories && (
                 <ErrorPage code={500} message="Something went wrong." />
             )}
-        </>
+        </PageLayout>
     );
 };
 

@@ -11,25 +11,49 @@ import type {
 } from "./apiResponseTypes";
 import { defaultFetch } from "./defaultFetch";
 
-export const getAuthCallback = async (): Promise<void> => {
-    const res = await defaultFetch(`auth/callback`, {
+export const createAccount = async ({
+    first_name,
+    last_name,
+    email,
+    password,
+    confirmPassword,
+}: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+}): Promise<void> => {
+    const res = await defaultFetch(`auth/create`, {
         headers: {
             "Content-Type": "application/json",
         },
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({
+            first_name,
+            last_name,
+            email,
+            password,
+            confirmPassword,
+        }),
     });
 
     return res.json();
 };
 
-export const login = async (): Promise<{ authUrl: string }> => {
+export const login = async ({
+    email,
+    password,
+}: {
+    email: string;
+    password: string;
+}): Promise<{ authUrl: string }> => {
     const res = await defaultFetch(`auth/login`, {
         headers: {
             "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify({ currentUrl: window.location.href }),
-        credentials: "include",
+        body: JSON.stringify({ email, password }),
     });
 
     const { authUrl, cookie } = await res.json();
@@ -37,7 +61,7 @@ export const login = async (): Promise<{ authUrl: string }> => {
     return { authUrl };
 };
 
-export const logout = async (): Promise<{ authUrl: string }> => {
+export const logout = async (): Promise<void> => {
     const res = await defaultFetch(`auth/logout`, {
         headers: {
             "Content-Type": "application/json",

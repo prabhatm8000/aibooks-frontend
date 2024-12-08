@@ -5,31 +5,30 @@ const UserAvtar = ({
     size,
 }: {
     user: {
-        given_name: string;
-        family_name: string;
-        picture: string;
-        name: string;
+        first_name: string;
+        last_name: string;
+        email: string;
     };
     size?: number;
 }) => {
     return (
         <Avatar className="">
             <AvatarImage
-                alt={user.given_name}
-                src={user.picture}
+                alt={user.first_name}
+                src={""}
                 width={size || 30}
                 height={size || 30}
                 className="object-cover rounded-full"
             />
             <AvatarFallback className="">
                 <div
-                    className={`flex items-center justify-center rounded-full`}
+                    className={`flex items-center justify-center rounded-full border border-muted`}
                     style={{
                         width: size || 30,
                         height: size || 30,
                     }}
                 >
-                    {user.given_name.charAt(0) + user.family_name.charAt(0)}
+                    {user.first_name.charAt(0) + user.last_name.charAt(0)}
                 </div>
             </AvatarFallback>
         </Avatar>

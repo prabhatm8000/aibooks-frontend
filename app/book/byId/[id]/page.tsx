@@ -6,6 +6,7 @@ import HeadingWithUnderline from "@/app/components/HeadingWithUnderline";
 import LoaderPage from "@/app/components/Loader/LoaderPage";
 import LoadingSpinner from "@/app/components/Loader/LoadingSpinner";
 import ThreeDotLoading from "@/app/components/Loader/ThreeDotLoading";
+import PageLayout from "@/app/components/PageLayout";
 import StarRating from "@/app/components/StarRating";
 import StarRatingInput from "@/app/components/StarRatingInput";
 import { Button } from "@/app/components/ui/button";
@@ -120,7 +121,14 @@ const BookDetailsSection = ({ book }: { book: BookResponse }) => {
     }, [book]);
 
     return (
-        <div className="flex flex-col items-center lg:items-start lg:flex-row gap-4 h-full">
+        <div className="flex flex-col items-center lg:items-start lg:flex-row gap-4 min-h-[calc(50vh)] h-full relative">
+            <Image
+                src={book.coverImage.url}
+                alt={book.title}
+                width={book.coverImage.width.large}
+                height={book.coverImage.height.large}
+                className="object-cover fixed -z-30 top-0 right-1/2 w-full h-1/2 blur-[100px] opacity-20"
+            />
             <Image
                 src={book.coverImage.url}
                 alt={book.title}
@@ -231,7 +239,10 @@ const RelatedBooksSection = () => {
                 {relatedBooks?.length > 0 && (
                     <div className="flex items-center w-full gap-4">
                         {relatedBooks.map((book) => (
-                            <div key={book.id} className="min-w-[250px] max-w-[250px]">
+                            <div
+                                key={book.id}
+                                className="min-w-[250px] max-w-[250px]"
+                            >
                                 <BookCard book={book} />
                             </div>
                         ))}
@@ -418,14 +429,12 @@ const ReviewCard = ({ review }: { review: BookRatingResponse }) => {
             className="flex flex-col gap-2 border-b pb-2 w-full"
         >
             <div className="flex items-start justify-start gap-2 w-full">
-                <span className="size-7 py-1">
-                    <UserAvtar size={40} user={review.user} />
-                </span>
+                <UserAvtar size={40} user={review.user} />
                 <div className="flex flex-col items-start justify-start gap-2 w-fit">
                     <div className="flex flex-col items-start">
-                        <TypographyH5>{review.user.name}</TypographyH5>
+                        <TypographyH5>{`${review.user.first_name} ${review.user.last_name}`}</TypographyH5>
                         <TypographySmall isMuted>
-                            {review.user.nickname}
+                            {review.user.email}
                         </TypographySmall>
                     </div>
                     <div className="space-y-1">
@@ -528,7 +537,7 @@ const ReviewsSection = () => {
     );
 };
 
-const Page =() => {
+const Page = () => {
     const params = useParams();
     const id = params?.id as string;
     const [book, setBook] = useState<BookResponse>();
@@ -564,7 +573,7 @@ const Page =() => {
         return () => controller.abort(CancelAbortMsg);
     }, []);
     return (
-        <>
+        <PageLayout>
             {isError && <ErrorPage code={500} message="Something went wrong" />}
             {loadingBook && <LoaderPage />}
             {book && (
@@ -574,7 +583,7 @@ const Page =() => {
                     <ReviewsSection />
                 </div>
             )}
-        </>
+        </PageLayout>
     );
 };
 
