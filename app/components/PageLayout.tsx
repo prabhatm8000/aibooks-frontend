@@ -92,9 +92,11 @@ export default function PageLayout({
             </main>
             {!disableFooter && (
                 <FooterSection>
-                    <TypographyH2 className="my-4 text-center w-full">
-                        AiBooks
-                    </TypographyH2>
+                    <Link href={"/"}>
+                        <TypographyH2 className="my-4 text-center w-full">
+                            AiBooks
+                        </TypographyH2>
+                    </Link>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 justify-center">
                         {footerItems.map((item, index) => (
                             <div

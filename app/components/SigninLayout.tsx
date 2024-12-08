@@ -1,6 +1,7 @@
 import Image from "next/image";
 import ToggleThemeButton from "./ui/toogleThemeBtn";
 import { TypographyH2, TypographySmall } from "./ui/typography";
+import Link from "next/link";
 
 const SigninLayout = ({ children }: { children: React.ReactNode }) => {
     return (
@@ -25,9 +26,12 @@ const SigninLayout = ({ children }: { children: React.ReactNode }) => {
                 loading="eager"
                 className="object-cover h-full w-full lg:w-1/2 absolute top-0 right-0"
             />
-            <span className="fixed top-0 left-0 m-8 text-black lg:text-foreground">
+            <Link
+                href={"/"}
+                className="fixed top-0 left-0 m-8 text-black lg:text-foreground"
+            >
                 <TypographyH2>AiBooks</TypographyH2>
-            </span>
+            </Link>
             <span className="fixed top-0 right-0 m-8">
                 <ToggleThemeButton />
             </span>
