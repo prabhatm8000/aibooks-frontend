@@ -15,12 +15,14 @@ export const createAccount = async ({
     first_name,
     last_name,
     email,
+    otp,
     password,
     confirmPassword,
 }: {
     first_name: string;
     last_name: string;
     email: string;
+    otp: string;
     password: string;
     confirmPassword: string;
 }): Promise<void> => {
@@ -33,9 +35,22 @@ export const createAccount = async ({
             first_name,
             last_name,
             email,
+            otp,
             password,
             confirmPassword,
         }),
+    });
+
+    return res.json();
+};
+
+export const sendOtp = async (email: string): Promise<void> => {
+    const res = await defaultFetch(`auth/sendOtp`, {
+        headers: {
+            "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ email }),
     });
 
     return res.json();

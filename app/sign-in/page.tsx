@@ -1,17 +1,18 @@
 "use client";
 
 import { toast } from "@/hooks/use-toast";
-import { createAccount, login } from "@/lib/apiClient";
+import { createAccount, login, sendOtp } from "@/lib/apiClient";
 import { CancelAbortMsg } from "@/lib/defaults";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import LoadingSpinner from "../components/Loader/LoadingSpinner";
 import SigninLayout from "../components/SigninLayout";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { TypographyH3 } from "../components/ui/typography";
+import useUserAuthStore from "@/hooks/zustand/useUserAuthStore";
 
 const LoginForm = ({
     setShowForm,
@@ -58,7 +59,7 @@ const LoginForm = ({
     });
     return (
         <form
-            className="flex flex-col gap-6 w-full border border-muted/60 p-10 rounded-lg bg-background/90 backdrop-blur-sm"
+            className="flex flex-col gap-6 w-full border border-muted/60 p-10 rounded-lg bg-background/70 backdrop-blur-sm"
             onSubmit={onSubmit}
         >
             <div>
@@ -100,7 +101,7 @@ const LoginForm = ({
                 className="flex justify-center items-center gap-2"
                 disabled={loading}
             >
-                {loading && <LoadingSpinner />}
+                {loading && <LoadingSpinner className="text-background" />}
                 <span>Login</span>
             </Button>
             <span
@@ -119,6 +120,8 @@ const CreateAccountForm = ({
     setShowForm: (form: string) => void;
 }) => {
     const [loading, setLoading] = useState(false);
+    const [sendingOtp, setSendingOtp] = useState(false);
+    const [sendOtpTimer, setSendOtpTimer] = useState(0);
     const router = useRouter();
     const {
         register,
@@ -127,21 +130,62 @@ const CreateAccountForm = ({
         formState: { errors },
         reset,
     } = useForm();
+
     const handleFormChange = (form: string) => {
         setShowForm(form);
         reset();
     };
+
+    const handleSendOtp = async () => {
+        setSendingOtp(true);
+        setSendOtpTimer(60);
+        const email = watch("email");
+
+        try {
+            await sendOtp(email);
+        } catch (err: any) {
+            if (err !== CancelAbortMsg) {
+                toast({
+                    title: "Error",
+                    description: "message" in err ? err.message : err,
+                    variant: "destructive",
+                });
+            }
+        } finally {
+            setSendingOtp(false);
+        }
+
+        const timer = setInterval(() => {
+            setSendOtpTimer((prev) => (prev > 0 ? prev - 1 : 0));
+        }, 1000);
+
+        setTimeout(() => {
+            clearInterval(timer);
+            setSendOtpTimer(0);
+        }, 60000);
+
+        return () => clearInterval(timer);
+    };
+
     const onSubmit = handleSubmit((data: FieldValues) => {
-        const { first_name, last_name, email, password, confirmPassword } =
+        const { first_name, last_name, email, otp, password, confirmPassword } =
             data as {
                 first_name: string;
                 last_name: string;
                 email: string;
+                otp: string;
                 password: string;
                 confirmPassword: string;
             };
         setLoading(true);
-        createAccount({ first_name, last_name, email, password, confirmPassword })
+        createAccount({
+            first_name,
+            last_name,
+            email,
+            otp,
+            password,
+            confirmPassword,
+        })
             .then(() => {
                 const path = localStorage.getItem("prevPath") || "/";
                 localStorage.removeItem("prevPath");
@@ -160,9 +204,10 @@ const CreateAccountForm = ({
                 setLoading(false);
             });
     });
+
     return (
         <form
-            className="flex flex-col gap-6 w-full border border-muted/60 p-10 rounded-lg bg-background/90 backdrop-blur-sm"
+            className="flex flex-col gap-6 w-full border border-muted/60 p-10 rounded-lg bg-background/70 backdrop-blur-sm"
             onSubmit={onSubmit}
         >
             <div>
@@ -197,23 +242,54 @@ const CreateAccountForm = ({
                         {errors.last_name.message?.toString()}
                     </span>
                 )}
-                <Input
-                    placeholder="Email"
-                    type="email"
-                    className={`border-muted/60 bg-transparent ${
-                        errors.email ? "border-destructive" : ""
-                    }`}
-                    {...register("email", {
-                        required: "Email is required",
-                        pattern: {
-                            value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                            message: "Enter a valid email",
-                        },
-                    })}
-                />
+                <div className="grid grid-cols-[8fr_2fr] gap-2">
+                    <Input
+                        placeholder="Email"
+                        type="email"
+                        className={`border-muted/60 bg-transparent ${
+                            errors.email ? "border-destructive" : ""
+                        }`}
+                        {...register("email", {
+                            required: "Email is required",
+                            pattern: {
+                                value: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                                message: "Enter a valid email",
+                            },
+                        })}
+                    />
+                    <Button
+                        disabled={sendingOtp || sendOtpTimer > 0}
+                        onClick={handleSendOtp}
+                        type="button"
+                    >
+                        {sendingOtp && (
+                            <LoadingSpinner className="text-background" />
+                        )}
+                        <span>
+                            {sendOtpTimer > 0 && !sendingOtp
+                                ? `Resend ${sendOtpTimer}s`
+                                : "Send OTP"}
+                        </span>
+                    </Button>
+                </div>
                 {errors.email && (
                     <span className="text-red-600 text-sm">
                         {errors.email.message?.toString()}
+                    </span>
+                )}
+                <Input
+                    placeholder="OTP"
+                    type="otp"
+                    className={`border-muted/60 bg-transparent ${
+                        errors.otp ? "border-destructive" : ""
+                    }`}
+                    {...register("otp", {
+                        required: "OTP is required",
+                    })}
+                />
+                {errors.otp && (
+                    <span className="text-red-600 text-sm">
+                        {errors.otp.message?.toString()}
                     </span>
                 )}
                 <Input
@@ -262,7 +338,7 @@ const CreateAccountForm = ({
                 className="flex justify-center items-center gap-2"
                 disabled={loading}
             >
-                {loading && <LoadingSpinner />}
+                {loading && <LoadingSpinner className="text-background" />}
                 <span>Create</span>
             </Button>
             <span
@@ -278,6 +354,8 @@ const CreateAccountForm = ({
 const Page = () => {
     const [showForm, setShowForm] = useState<string>("login");
     const [animate, setAnimate] = useState<boolean>(false);
+    const router = useRouter();
+    const { getAuth, user } = useUserAuthStore();
 
     const handleFormChange = (form: string) => {
         setAnimate(true);
@@ -286,6 +364,16 @@ const Page = () => {
             setAnimate(false);
         }, 300);
     };
+
+    // #region [authenticated redirect]
+    useEffect(() => {
+        if (user) {
+            router.push("/");
+            return;
+        }
+        getAuth().then((res) => res && router.push("/"));
+    }, []);
+    // #endregion
 
     return (
         <SigninLayout>

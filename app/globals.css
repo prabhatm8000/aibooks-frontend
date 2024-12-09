@@ -77,6 +77,11 @@
     }
 }
 
+:root {
+    --theme-white: 60 9.1% 97.8%;
+    --theme-black: 20 14.3% 4.1%;
+}
+
 @layer base {
     * {
         @apply border-border;
@@ -103,6 +108,7 @@
         transform: translateY(50px);
         filter: blur(1px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0px);

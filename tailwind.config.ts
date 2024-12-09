@@ -63,6 +63,10 @@ export default {
                     border: "hsl(var(--sidebar-border))",
                     ring: "hsl(var(--sidebar-ring))",
                 },
+                theme: {
+                    white: "hsl(var(--theme-white))",
+                    black: "hsl(var(--theme-black))",
+                }
             },
             borderRadius: {
                 lg: "var(--radius)",

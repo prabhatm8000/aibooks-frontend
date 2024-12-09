@@ -42,7 +42,9 @@ export const defaultFetch = async (
             description: res.statusText || "Uh oh! Something went wrong",
             variant: "destructive",
         });
-        throw new Error(res.statusText);
+        const body = await res.json();
+        const err = `${res.statusText}: ${body.message || "Something went wrong"}`;
+        throw new Error(err);
     }
 
     return res;

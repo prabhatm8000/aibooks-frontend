@@ -62,7 +62,7 @@ const heroLines = [
 
 const heroLineCards = heroLines.map((line, index) => (
     <div key={index} className="h-full">
-        <TypographyH1 className="text-center text-5xl">{line}</TypographyH1>
+        <TypographyH1 className="text-center text-5xl text-theme-white">{line}</TypographyH1>
     </div>
 ));
 
@@ -70,7 +70,7 @@ const HeroSection = () => {
     return (
         <div className="relative w-full h-[35rem] lg:h-[30rem]">
             <Image
-                src={"/static/images/bg-home-hero.jpg"}
+                src={"/static/images/bg-6.jpg"}
                 alt=""
                 width={1920}
                 height={1080}

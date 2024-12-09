@@ -185,7 +185,7 @@ function SearchWithSuggestions({
 }
 
 const UserButton = () => {
-    const { user, setUser, resetUser } = useUserAuthStore();
+    const { user, getAuth, logoutAndResetUser } = useUserAuthStore();
     const router = useRouter();
     const userActions = [
         {
@@ -203,12 +203,7 @@ const UserButton = () => {
             type: "button",
             onClickHandler: (e: React.MouseEvent<HTMLButtonElement>) => {
                 e.preventDefault();
-                logout()
-                    .then(() => {
-                        resetUser();
-                    })
-                    .catch((err) => console.log(err))
-                    .finally(() => console.log("done"));
+                logoutAndResetUser();
             },
             icon: (
                 <>
@@ -225,9 +220,7 @@ const UserButton = () => {
     };
 
     useEffect(() => {
-        getUser()
-            .then((data) => setUser(data))
-            .catch((err) => console.log(err));
+        getAuth();
     }, []);
 
     return (
@@ -317,7 +310,7 @@ const UserButton = () => {
 export default function NavBar({
     onMenuBtnClick,
 }: {
-    onMenuBtnClick: () => void;
+    onMenuBtnClick?: () => void;
 }) {
     const router = useRouter();
     const [isSearchInputFocused, setIsSearchInputFocused] = useState(false);
@@ -393,13 +386,15 @@ export default function NavBar({
                 <header className="w-full px-4">
                     <nav className="flex justify-between gap-4 items-center py-4">
                         <div className="flex items-center gap-2 md:hidden">
-                            <Button
-                                variant={"ghost"}
-                                size={"icon"}
-                                onClick={onMenuBtnClick}
-                            >
-                                <MenuIcon />
-                            </Button>
+                            {onMenuBtnClick && (
+                                <Button
+                                    variant={"ghost"}
+                                    size={"icon"}
+                                    onClick={onMenuBtnClick}
+                                >
+                                    <MenuIcon />
+                                </Button>
+                            )}
                             <TypographyH3>AiBooks</TypographyH3>
                         </div>
 
