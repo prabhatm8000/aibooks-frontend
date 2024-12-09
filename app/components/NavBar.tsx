@@ -24,15 +24,15 @@ import {
 } from "./ui/typography";
 
 import useUserAuthStore from "@/hooks/zustand/useUserAuthStore";
-import { getSearchSuggestions, getUser, logout } from "@/lib/apiClient";
+import { getSearchSuggestions } from "@/lib/apiClient";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import LoadingSpinner from "./Loader/LoadingSpinner";
+import { widthStyle } from "./PageLayout";
 import { ButtonLink } from "./ui/buttonlink";
 import ToggleThemeButton from "./ui/toogleThemeBtn";
 import UserAvtar from "./UserAvtar";
-import { widthStyle } from "./PageLayout";
 
 type SuggestionsType = {
     id: string;

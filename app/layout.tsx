@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import { getAuth } from "@/hooks/auth";
 
 export const metadata: Metadata = {
     title: "AiBooks",
