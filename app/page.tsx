@@ -55,35 +55,42 @@ const heroCards = heroCardContent.map((item, index) => (
 ));
 
 const heroLines = [
-    "Explore the Boundless Imagination of AI: Unique Stories Crafted by Artificial Intelligence!",
-    "Step Into a Library Like No Other: AI-Generated Stories, Endless Creativity.",
-    "Where AI Meets Storytelling: Discover Worlds Only Machines Can Imagine.",
+    {
+        line: "Explore the Boundless Imagination of AI: Unique Stories Crafted by Artificial Intelligence!",
+        bgImg: "/static/images/bg-hero-1.jpg",
+    },
+    {
+        line: "Step Into a Library Like No Other: AI-Generated Stories, Endless Creativity.",
+        bgImg: "/static/images/bg-hero-2.jpg",
+    },
+    {
+        line: "Where AI Meets Storytelling: Discover Worlds Only Machines Can Imagine.",
+        bgImg: "/static/images/bg-hero-3.jpg",
+    },
 ];
 
 const heroLineCards = heroLines.map((line, index) => (
-    <div key={index} className="h-full">
-        <TypographyH1 className="text-center text-5xl text-theme-white">{line}</TypographyH1>
+    <div key={index} className="relative w-full h-[35rem] lg:h-[30rem] rounded-xl">
+        <Image
+            src={line.bgImg}
+            alt=""
+            width={1920}
+            height={1080}
+            loading="eager"
+            className="object-cover rounded-xl h-[35rem] lg:h-[30rem]"
+        />
+        <div
+            className={`absolute top-0 w-full h-full flex justify-center items-center bg-theme-black/30 p-2 rounded-xl`}
+        >
+            <TypographyH1 className="text-center text-5xl text-theme-white">
+                {line.line}
+            </TypographyH1>
+        </div>
     </div>
 ));
 
 const HeroSection = () => {
-    return (
-        <div className="relative w-full h-[35rem] lg:h-[30rem]">
-            <Image
-                src={"/static/images/bg-6.jpg"}
-                alt=""
-                width={1920}
-                height={1080}
-                loading="eager"
-                className="object-cover rounded-xl h-[35rem] lg:h-[30rem]"
-            />
-            <div
-                className={`absolute top-0 w-full h-full align-middle bg-background/10 p-2 text-white`}
-            >
-                <AutoCarousel cardContents={heroLineCards} />
-            </div>
-        </div>
-    );
+    return <AutoCarousel cardContents={heroLineCards} />;
 };
 
 const DynamicLatestRelease = dynamic(
