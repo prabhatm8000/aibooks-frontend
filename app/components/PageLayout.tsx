@@ -33,7 +33,7 @@ const footerItems = [
             },
             {
                 name: "Github",
-                href: "#",
+                href: "https://github.com/prabhatm8000/aibooks-frontend",
             },
             {
                 name: "Gmail",
@@ -41,7 +41,7 @@ const footerItems = [
             },
             {
                 name: "X",
-                href: "#",
+                href: "https://www.x.com/prabhatm8000",
             },
         ],
     },
